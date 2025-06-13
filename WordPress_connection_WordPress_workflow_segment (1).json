@@ -1,0 +1,136 @@
+{
+  "name": "WordPress connection/WordPress workflow segment",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "0819c57a-7101-40dd-9cc3-3acb1fde1ec5",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://lukashoyle2025.mystagingwebsite.com/wp-json/wp/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "c2b40d0f-4887-4547-9b6c-c27cbf13bcef",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "l4d32uJXiKY0XDw4",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Remove HTML tags and convert to plain text\nconst post = $json[\"content\"][\"rendered\"];\nconst stripped = post.replace(/<[^>]*>/g, '');\nreturn [{ plainText: stripped }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "0e0bd80b-7208-4fbf-8426-64708d7d7e65",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4",
+          "mode": "list",
+          "cachedResultName": "GPT-4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Summarize this blog post in 2-3 sentences, in your own words:\n{{ $json[\"plainText\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        0
+      ],
+      "id": "25090219-87b9-4b83-b0dd-3f64337a5b23",
+      "name": "OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "0Ge6ffP8ZIymrhDs",
+          "name": "OpenAi account 4"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When clicking ‘Execute workflow’": [
+      {
+        "json": {}
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "be39075e-7384-4bf1-bc11-f301e279ac43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f318f1eeb582bef69a56797ad1f28184a54cfe51b0e461ee190c5740946ea07e"
+  },
+  "id": "lmlr54k92cMKHvy9",
+  "tags": []
+}
