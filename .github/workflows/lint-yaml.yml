@@ -1,0 +1,14 @@
+name: Lint YAML
+
+on: [push, pull_request]
+
+jobs:
+  lint-yaml:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Run yamllint
+        uses: ibiqlik/action-yamllint@v3
