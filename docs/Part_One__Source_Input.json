@@ -1,0 +1,497 @@
+{
+  "name": "Part One: Source Input",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "62b53abd-aa2a-4cf5-b20f-fa829e326e6f",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        180,
+        0
+      ],
+      "id": "9c37e3d9-f8b9-48c0-a4a7-eb7a5d7b2751",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bc9502a5-83be-4ea9-924e-0824e5b4ed04",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        380,
+        0
+      ],
+      "id": "4032c245-9444-439d-b00f-551c5ff6c89d",
+      "name": "Only Use Un-processed"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        580,
+        0
+      ],
+      "id": "38cfeed8-4fce-4dbd-94c6-de703e0e1b2e",
+      "name": "Normalize Fields"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        800,
+        0
+      ],
+      "id": "30f72cbc-e1fc-40be-89d5-2ba224156026",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "h2jF1G1E50DEc7cB",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "eff487d8-4ef9-4e81-9bb2-6e0921cfbabe",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "fb40e6b8-e3be-4e9e-a63a-de058ee2d1bc",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "12Citj4UGDHNi-sPiWlH2d34rf75xvCakfE4JJdoKPYY",
+          "mode": "list",
+          "cachedResultName": "Workflow Logs",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12Citj4UGDHNi-sPiWlH2d34rf75xvCakfE4JJdoKPYY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12Citj4UGDHNi-sPiWlH2d34rf75xvCakfE4JJdoKPYY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Message": "Duplicate Sermon Detected",
+            "Title": "={{ $json.sermonTitle }}",
+            "Audio URL": "={{ $json.audioURL }}",
+            "DateTime": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Title",
+              "displayName": "Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Audio URL",
+              "displayName": "Audio URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DateTime",
+              "displayName": "DateTime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1240,
+        100
+      ],
+      "id": "4bde3dc0-a254-40e6-bf3e-b86c1fd962b5",
+      "name": "Workflow Duplication Log",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "h2jF1G1E50DEc7cB",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1WK-HflA4niUGJYAYVMWXPFIJo_T9ha-_gJ4GZkFaCkg",
+          "mode": "list",
+          "cachedResultName": "Sermon Workflow",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WK-HflA4niUGJYAYVMWXPFIJo_T9ha-_gJ4GZkFaCkg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1WK-HflA4niUGJYAYVMWXPFIJo_T9ha-_gJ4GZkFaCkg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Sermon Title": "={{ $json.sermonTitle }}",
+            "Speaker": "={{ $json.speaker }}",
+            "Date": "={{ $json.sermonDate }}",
+            "Audio URL": "={{ $json.audioURL }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Sermon Title",
+              "displayName": "Sermon Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Speaker",
+              "displayName": "Speaker",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Audio URL",
+              "displayName": "Audio URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1240,
+        -100
+      ],
+      "id": "6b11952e-b48a-4c41-88c9-bf9aa81c5f21",
+      "name": "Middleware table",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "h2jF1G1E50DEc7cB",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08UMFCT0HM",
+          "mode": "list",
+          "cachedResultName": "hoylelv"
+        },
+        "text": "=New sermon added to workflow:\nTitle: {{ $json.sermonTitle }}\nSpeaker: {{ $json.speaker }}\nURL: {{ $json.audioUrl }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1460,
+        -100
+      ],
+      "id": "078f2d9d-5b95-44ba-b341-3a08ec50a5e7",
+      "name": "NewSermonNotification",
+      "webhookId": "612b7ab5-d090-456d-b4da-3563e072cfbe",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ENQOBxLNQ85FXiTp",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08UMFCT0HM",
+          "mode": "list",
+          "cachedResultName": "hoylelv"
+        },
+        "text": "Sermon Duplicate Detected, Log of Event Created",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1460,
+        100
+      ],
+      "id": "cdfc9bd3-9b66-4884-b279-c4076dd54bef",
+      "name": "DuplicateSermonNotification",
+      "webhookId": "c547f00f-9b02-4cfb-bbac-24534d33db51",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ENQOBxLNQ85FXiTp",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Only Use Un-processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Only Use Un-processed": {
+      "main": [
+        [
+          {
+            "node": "Normalize Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Middleware table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Workflow Duplication Log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Workflow Duplication Log": {
+      "main": [
+        [
+          {
+            "node": "DuplicateSermonNotification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Middleware table": {
+      "main": [
+        [
+          {
+            "node": "NewSermonNotification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bfe17b92-258c-49e0-b58f-8297c9e13ad2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f318f1eeb582bef69a56797ad1f28184a54cfe51b0e461ee190c5740946ea07e"
+  },
+  "id": "OQzJPyo6UMwPKcxV",
+  "tags": []
+}
