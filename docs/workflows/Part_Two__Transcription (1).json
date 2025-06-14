@@ -1,0 +1,329 @@
+{
+  "name": "Part Two: Transcription",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "/transcription-start",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "edbf17b9-33e7-42e7-9c9c-25cfc5e75a6e",
+      "name": "Webhook",
+      "webhookId": "6400f027-2fe4-4abc-a17b-18553d1983bd"
+    },
+    {
+      "parameters": {
+        "url": "={{  $json.audioURL }}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "audio"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "e5a4eccc-1958-4ef1-aad4-e8a8ac378ed5",
+      "name": "Download Audio File"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/audio/transcriptions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "71635b93-7500-4067-884a-f0731b513d5e",
+      "name": "Transcription API Call",
+      "credentials": {
+        "openAiApi": {
+          "id": "0Ge6ffP8ZIymrhDs",
+          "name": "OpenAi account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.text;\nconst cleaned = raw.replace(/\\s{2,}/g, ' ').trim();\nreturn [{ cleanedTranscript: cleaned }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "23557c1a-50aa-4a58-9ee7-8a8452d73609",
+      "name": "Clean Transcript"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "https://docs.google.com/document/d/17vvcOIpiZFBf98seuBzgLyx3g3GNlkoosizoEJl9FrI/edit?tab=t.0",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $json.transcriptURL }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "d1bf8232-a1b3-4eb9-ab79-2abda302c36b",
+      "name": "Transcription Records",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "gJYy9g6NFh7qxFh5",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ej3X3GggCs4c2MN-BKgc_BPxr3mwdGgbjIZWYIV65uc",
+          "mode": "list",
+          "cachedResultName": "TranscriptionApprovalQueue",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ej3X3GggCs4c2MN-BKgc_BPxr3mwdGgbjIZWYIV65uc/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ej3X3GggCs4c2MN-BKgc_BPxr3mwdGgbjIZWYIV65uc/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Sermon Title": "={{ $json.sermonTitle }}",
+            "Transcript Excerpt": "={{ $json.transcript.substring(0,200) }}",
+            "Full Transcript URL": "={{ $json.transcriptURL }}",
+            "Status": "Pending",
+            "Decision By": "Lukas Hoyle"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Sermon Title",
+              "displayName": "Sermon Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcript Excerpt",
+              "displayName": "Transcript Excerpt",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Full Transcript URL",
+              "displayName": "Full Transcript URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Approver Notes",
+              "displayName": "Approver Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Decision By",
+              "displayName": "Decision By",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "61295b40-42ed-410c-a3fc-1b86e89e592e",
+      "name": "Middleware Step1",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "h2jF1G1E50DEc7cB",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08UMFCT0HM",
+          "mode": "list",
+          "cachedResultName": "hoylelv"
+        },
+        "text": "=📝 *New Transcript Ready for Review*  *Sermon:* {{ $json[\"Sermon Title\"] }} *Excerpt:* {{ $json[\"Transcript Excerpt\"] }}  📄 [View Full Transcript]({{ $json[\"Full Transcript URL\"] }})  Please review in the approval sheet and update the status.",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "27ee101b-2177-462c-9e9b-e5a55fd7f387",
+      "name": "Middleware UserProd",
+      "webhookId": "50179f81-52c3-48cb-8e38-901072695dc6",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ENQOBxLNQ85FXiTp",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Download Audio File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Audio File": {
+      "main": [
+        [
+          {
+            "node": "Transcription API Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcription API Call": {
+      "main": [
+        [
+          {
+            "node": "Clean Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean Transcript": {
+      "main": [
+        [
+          {
+            "node": "Transcription Records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcription Records": {
+      "main": [
+        [
+          {
+            "node": "Middleware Step1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Middleware Step1": {
+      "main": [
+        [
+          {
+            "node": "Middleware UserProd",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "59e3c803-5ab6-4c34-8ee7-4662f439ebf7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f318f1eeb582bef69a56797ad1f28184a54cfe51b0e461ee190c5740946ea07e"
+  },
+  "id": "OShpJhlhSDGJFYEy",
+  "tags": []
+}
