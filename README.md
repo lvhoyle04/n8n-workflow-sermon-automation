@@ -16,7 +16,7 @@ This project automates the full sermon publishing workflow from recording to out
 - 📝 **Transcription**: Sends audio to AI transcription (e.g. Whisper or AssemblyAI)
 - ✍️ **Blog Post Generation**: Automatically generates and uploads sermon blog posts
 - 📣 **Social Media Posts**: Creates social captions for platforms like Facebook or X
-- 🎬 **YouTube Uploads**: Publishes full sermons and auto-generated Shorts
+- 🎬 **YouTube Uploads**: Publishes full sermons and auto-generated Shorts 
 - ✅ **Human Approval Integration**: Optionally routes content for human review
 
 ---
