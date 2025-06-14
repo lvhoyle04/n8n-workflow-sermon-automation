@@ -1,0 +1,14 @@
+NOTICE OF LICENSING STATUS
+
+This project is currently distributed under the MIT License for the duration of Lukas Hoyle's internship at Five More Talents (5MT).
+
+The license grants use, modification, and distribution rights to internship supervisors, collaborators, and relevant stakeholders for the purposes of development, testing, and evaluation.
+
+Upon completion of the internship, Lukas Hoyle retains full ownership and control of the source code, workflows, and intellectual property contained within this repository. At that time, the license may be modified, restricted, or removed entirely at the author’s discretion.
+
+This notice does not transfer ownership to any third party. All rights not expressly granted under the current license remain reserved by the author.
+
+—  
+Lukas Hoyle  
+Author and Creator  
+13 June 2025
