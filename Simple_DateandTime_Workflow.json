@@ -5,10 +5,7 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "id": "159049d5-e256-4b7a-b68d-9ea0852f3147",
       "name": "When clicking ‘Execute workflow’"
     },
@@ -20,10 +17,7 @@
       },
       "type": "n8n-nodes-base.dateTime",
       "typeVersion": 2,
-      "position": [
-        220,
-        0
-      ],
+      "position": [220, 0],
       "id": "0f4cbeb8-bf74-467d-af2f-446238c6a5b9",
       "name": "Date & Time"
     },
@@ -43,10 +37,7 @@
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [
-        440,
-        0
-      ],
+      "position": [440, 0],
       "id": "fae25560-49a6-44d1-aaee-8188110b6709",
       "name": "Edit Fields"
     }

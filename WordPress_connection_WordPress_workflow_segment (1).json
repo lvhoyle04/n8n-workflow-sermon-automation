@@ -5,10 +5,7 @@
       "parameters": {},
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
-      "position": [
-        0,
-        0
-      ],
+      "position": [0, 0],
       "id": "0819c57a-7101-40dd-9cc3-3acb1fde1ec5",
       "name": "When clicking ‘Execute workflow’"
     },
@@ -21,10 +18,7 @@
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [
-        220,
-        0
-      ],
+      "position": [220, 0],
       "id": "c2b40d0f-4887-4547-9b6c-c27cbf13bcef",
       "name": "HTTP Request",
       "credentials": {
@@ -40,10 +34,7 @@
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [
-        440,
-        0
-      ],
+      "position": [440, 0],
       "id": "0e0bd80b-7208-4fbf-8426-64708d7d7e65",
       "name": "Code"
     },
@@ -66,10 +57,7 @@
       },
       "type": "@n8n/n8n-nodes-langchain.openAi",
       "typeVersion": 1.8,
-      "position": [
-        640,
-        0
-      ],
+      "position": [640, 0],
       "id": "25090219-87b9-4b83-b0dd-3f64337a5b23",
       "name": "OpenAI",
       "credentials": {

@@ -16,7 +16,7 @@ This project automates the full sermon publishing workflow from recording to out
 - 📝 **Transcription**: Sends audio to AI transcription (e.g. Whisper or AssemblyAI)
 - ✍️ **Blog Post Generation**: Automatically generates and uploads sermon blog posts
 - 📣 **Social Media Posts**: Creates social captions for platforms like Facebook or X
-- 🎬 **YouTube Uploads**: Publishes full sermons and auto-generated Shorts 
+- 🎬 **YouTube Uploads**: Publishes full sermons and auto-generated Shorts
 - ✅ **Human Approval Integration**: Optionally routes content for human review
 
 ---
@@ -55,6 +55,7 @@ This project automates the full sermon publishing workflow from recording to out
 ## 🧾 Internship Context
 
 This project was created during my internship at Five More Talents (5MT), where I was tasked with:
+
 - Researching and designing the workflow
 - Writing automation logic in n8n
 - Integrating APIs from various platforms
@@ -73,5 +74,3 @@ MIT License
 **Lukas Hoyle**  
 Cybersecurity Major | Anderson University (SC)  
 linkedin.com/in/lukas-hoyle-411003325
-
-
