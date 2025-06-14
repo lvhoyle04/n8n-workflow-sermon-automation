@@ -1,0 +1,181 @@
+{
+  "name": "Email Verification & Filtering",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "email-verifier",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "76788ce7-bea8-4d72-9fd0-0b1bbf6e5472",
+      "name": "Webhook",
+      "webhookId": "8d5868dd-b7bb-4e8b-8639-7b71cfba8d2f"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.kickbox.com/v2/verify?email={{ $json.email }}&apikey=live_6ed798e75e4fa8fdd7583f816b9133da468ef6cd0400e0306302f69204e0438a",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "51c5ae75-e906-4f39-8337-6971f4c4f0bf",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "bfc3cc26-bd61-460b-a5d3-377191e601bd",
+              "leftValue": "={{ $json.result }}",
+              "rightValue": "\"deliverable\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "06f435ac-e2e4-4c21-aa75-c72e3755aa64",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08UMFCT0HM",
+          "mode": "list",
+          "cachedResultName": "hoylelv"
+        },
+        "text": "=⚠️ Undeliverable or risky email detected: {{ $json.email }}\nReason: {{ $json.reason }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        660,
+        100
+      ],
+      "id": "3ec056d8-418b-4b18-8ca1-5d8b61a99e79",
+      "name": "Slack",
+      "webhookId": "952c4576-9b7b-499e-ba36-44f2163e20fc",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ENQOBxLNQ85FXiTp",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U08UMFCT0HM",
+          "mode": "list",
+          "cachedResultName": "hoylelv"
+        },
+        "text": "Email verified, deliverable",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        660,
+        -100
+      ],
+      "id": "6ea65100-6593-409b-9886-bf68f99a5f46",
+      "name": "Slack1",
+      "webhookId": "25f3ada7-d801-4b01-a0bf-4213cdd2ff26",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "ENQOBxLNQ85FXiTp",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Slack1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Slack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ae72bf0b-e341-4f25-bbfb-b582793469dc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f318f1eeb582bef69a56797ad1f28184a54cfe51b0e461ee190c5740946ea07e"
+  },
+  "id": "hzWwxkkqkQmx73UH",
+  "tags": []
+}
