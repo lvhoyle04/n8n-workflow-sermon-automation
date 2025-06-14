@@ -1,3 +1,4 @@
+--- 
 name: Prettier Code Formatter
 
 on: [push, pull_request]
