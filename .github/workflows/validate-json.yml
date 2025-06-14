@@ -1,3 +1,4 @@
+---
 name: Validate Workflow JSON
 
 on: [push, pull_request]
