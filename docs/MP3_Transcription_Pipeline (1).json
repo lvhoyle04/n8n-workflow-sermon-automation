@@ -1,0 +1,336 @@
+{
+  "name": "MP3 Transcription Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "command": "mkdir -p /home/node/chunks && ffmpeg -i /home/node/input.mp3 -f segment -segment_time 300 -c copy /home/node/chunks/output_%03d.mp3\n\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        0
+      ],
+      "id": "a134d05e-bff8-4999-b098-66e13c551bfc",
+      "name": "Split with FFmpeg"
+    },
+    {
+      "parameters": {
+        "fileSelector": "/home/node/chunks/*.mp3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        680,
+        0
+      ],
+      "id": "a9734bb0-4172-419a-8f8e-b1899af3d155",
+      "name": "Load Chunked MP3s"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        900,
+        0
+      ],
+      "id": "69d26b27-201a-4300-a75f-d388e2e157ae",
+      "name": "Loop Through Chunks"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1120,
+        100
+      ],
+      "id": "d0621ef9-4a89-4967-833c-d8295ee786e6",
+      "name": "Transcribe with Whisper",
+      "credentials": {
+        "openAiApi": {
+          "id": "YfS6Ol6S6Wi7Yqhf",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const allTexts = items.map(item => item.json.text);\nreturn [{\n  json: {\n    transcript: allTexts.join(' ')\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        -100
+      ],
+      "id": "68cb3b98-dd63-4e83-b71f-036a0ce19f35",
+      "name": "Combine Transcript Text"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6db75bf-5929-447d-a849-e1f5b6f74d91",
+              "name": "transcript",
+              "value": "={{ $json.transcript }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1340,
+        -100
+      ],
+      "id": "72149cd8-0920-4931-b1d8-9ce039345bec",
+      "name": "Final Transcript Output"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 60
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -700,
+        0
+      ],
+      "id": "4e607348-159e-47a9-9fba-090456e9f708",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -460,
+        0
+      ],
+      "id": "ed142048-4372-4792-babb-ba049365a654",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {
+          "attrkey": "$_attr",
+          "explicitArray": true,
+          "mergeAttrs": false,
+          "normalizeTags": true
+        }
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "327ab245-2ecb-4716-b247-c55588976dac",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "jsCode": "const staticData = $getWorkflowStaticData('global');\n\nconst currentGuid = items[0].json.guid;  // Use title or link if guid is unavailable\nconst lastGuid = staticData.lastGuid;\n\nif (currentGuid === lastGuid) {\n  // Same sermon, don't continue\n  return [];\n}\n\n// New sermon detected, save new GUID\nstaticData.lastGuid = currentGuid;\n\nreturn items; // Allow next nodes to execute"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "c04620af-0e1d-455e-af71-fae628143151",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        100,
+        0
+      ],
+      "id": "2c32c64d-570a-4dd4-b599-339d3511d442",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "/home/node/input.mp3",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        320,
+        0
+      ],
+      "id": "98f411a3-e812-4152-bdd5-f931945a0354",
+      "name": "Read/Write Files from Disk"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Split with FFmpeg": {
+      "main": [
+        [
+          {
+            "node": "Load Chunked MP3s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Load Chunked MP3s": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Through Chunks": {
+      "main": [
+        [
+          {
+            "node": "Combine Transcript Text",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Transcribe with Whisper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe with Whisper": {
+      "main": [
+        [
+          {
+            "node": "Loop Through Chunks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Transcript Text": {
+      "main": [
+        [
+          {
+            "node": "Final Transcript Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Split with FFmpeg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ded727f7-086d-44e2-afbc-8dacb945fcb9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7a46daa1e013ce461b1527c29fad12eb286d319396fb4f3fbaf45afdf277ec3e"
+  },
+  "id": "Ea6Fr7HaRsUcXTgp",
+  "tags": []
+}
