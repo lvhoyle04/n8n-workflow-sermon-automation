@@ -1,0 +1,145 @@
+{
+  "name": "Puppeteer MP3 Fetch and Transcription",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a8f9bee0-9768-43ab-8119-68abc5863f68",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.sermonaudio.com/rss_source.asp?sourceid=woodruffroad",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "050d8ce6-b809-46c7-8d3d-280bdfea0cf1",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {
+          "explicitArray": true,
+          "explicitRoot": false
+        }
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        440,
+        0
+      ],
+      "id": "613a62a8-db7f-4406-84a0-af503b8e5a36",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86c6a07c-b64d-45c9-b63d-10fab8ad729a",
+              "name": "=sermonLink",
+              "value": "={{$json[\"channel\"][0][\"item\"][0][\"link\"][0]}}",
+              "type": "string"
+            },
+            {
+              "id": "ffb1003d-5f36-4b81-8f31-0f0887710208",
+              "name": "sermonTitle",
+              "value": "={{$json[\"channel\"][0][\"item\"][0][\"title\"][0]}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        660,
+        0
+      ],
+      "id": "3091a23f-23e7-498d-b389-b6b9caa6964a",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "command": "=node /home/node &&puppet_scraper.js \"{{$json[\"sermonLink\"]}}\"\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        880,
+        0
+      ],
+      "id": "b225c114-d858-46ba-9173-ad936cbb3257",
+      "name": "Execute Command"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "29328f93-f426-487c-9be2-13c135845f0a",
+  "meta": {
+    "instanceId": "ea90064828827e7f199f88c9d54066c4724c1ae45ff5aa10538993085e2b840e"
+  },
+  "id": "MuDTVCALS7tDFe5C",
+  "tags": []
+}
