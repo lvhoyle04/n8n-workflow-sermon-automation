@@ -1,0 +1,292 @@
+{
+  "name": "MP3 Transcription + Cleanup",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/upload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "6b25f33df7d644028f7242b80a4f1597"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/octet-stream"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1420,
+        320
+      ],
+      "id": "4687b7bf-a983-4303-a213-223805e20ec0",
+      "name": "Upload MP3 to AssemblyAI"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.assemblyai.com/v2/transcript",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "6b25f33df7d644028f7242b80a4f1597"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "JSON",
+        "body": "={\n  \"audio_url\": \"{{ $node['Upload MP3 to AssemblyAI'].json['upload_url'] }}\",\n  \"speaker_labels\": true,\n  \"auto_chapters\": true,\n  \"auto_highlights\": true,\n  \"summary_model\": \"informative\",\n  \"speech_model\": \"best\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1200,
+        320
+      ],
+      "id": "814a293a-500c-4339-bea1-456fe63fd406",
+      "name": "Transcribe the sermon via AssemblyAI"
+    },
+    {
+      "parameters": {
+        "amount": 60
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -980,
+        320
+      ],
+      "id": "b485b652-bf65-493f-9f14-46b7bf19ba84",
+      "name": "allowance of time for transcription ",
+      "webhookId": "b645589b-ce54-4ec4-a18c-c2efc3c2c77a"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.assemblyai.com/v2/transcript/{{ $json[\"id\"] }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "6b25f33df7d644028f7242b80a4f1597"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -760,
+        240
+      ],
+      "id": "d112c10f-3c54-41b1-b248-8eba51e87385",
+      "name": "Check transcript completion"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e3e82368-13b5-49bd-8b1d-6a8ee1d97a82",
+              "leftValue": "={{ $json[\"status\"] }}",
+              "rightValue": "completed",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -540,
+        320
+      ],
+      "id": "859b1797-90d4-438c-8921-1a75e533a657",
+      "name": "Check transcription status"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6e4ab77b-2132-4320-9b5d-6472d1a76bca",
+              "name": "transcript_text",
+              "value": "={{ $json[\"text\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "765d85cc-131c-4b9b-8228-a3a91b13170f",
+              "name": "highlights",
+              "value": "={{ $json.auto_highlights_result }}",
+              "type": "string"
+            },
+            {
+              "id": "351bdd5b-107e-4cb3-a07e-5aac17fb46fa",
+              "name": "chapters",
+              "value": "={{ $json[\"chapters\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        320
+      ],
+      "id": "111b74d7-c29c-4039-9ac8-42476719799e",
+      "name": "Extract relevant transcript data"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Take the following sermon transcript and format it into clean paragraphs and structured sections. Each section should represent a clear idea or point made by the speaker. If the speaker changes topics, create a new section with a short heading.\n\nAdd line breaks between each section. Do not alter theology or insert your own opinions. Do not change any words or alter any of the text, simply organize it as detailed above. Do not include any response other than the organized transcript.\n\nTranscript:\n{{ $json.transcript_text }}\n"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -100,
+        320
+      ],
+      "id": "fc2a9e3f-e8de-4c17-aec3-71cc9083b3d8",
+      "name": "Organization and clean-up of the transcript",
+      "credentials": {
+        "openAiApi": {
+          "id": "mC6NHOdsPQp4zPij",
+          "name": "OpenAi account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Upload MP3 to AssemblyAI": {
+      "main": [
+        [
+          {
+            "node": "Transcribe the sermon via AssemblyAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe the sermon via AssemblyAI": {
+      "main": [
+        [
+          {
+            "node": "allowance of time for transcription ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "allowance of time for transcription ": {
+      "main": [
+        [
+          {
+            "node": "Check transcript completion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check transcript completion": {
+      "main": [
+        [
+          {
+            "node": "Check transcription status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check transcription status": {
+      "main": [
+        [
+          {
+            "node": "Extract relevant transcript data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "allowance of time for transcription ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract relevant transcript data": {
+      "main": [
+        [
+          {
+            "node": "Organization and clean-up of the transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "29c7b894-3e10-4633-8082-5c549edcde57",
+  "meta": {
+    "instanceId": "cc3e1148aa2db61e7cb9d918303b67c0578ab742bb9ca07d8e3e8334915c56f5"
+  },
+  "id": "acG7dTvCrKSQjJMr",
+  "tags": []
+}
