@@ -1,0 +1,161 @@
+{
+  "name": "MP3 Download",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 0 20 * * 0"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -240,
+        -20
+      ],
+      "id": "d155cf11-0c5f-4648-a0ac-dd14a4728e22",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "options": {
+          "explicitArray": true,
+          "explicitRoot": false
+        }
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -40
+      ],
+      "id": "c90e67d2-886e-431a-8bd1-349f17a6d7d0",
+      "name": "Parse XML to JSON"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.mp3URL }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -40
+      ],
+      "id": "fc9731b3-cfb3-4488-8b7f-dd1e75ae5037",
+      "name": "Download MP3 File1"
+    },
+    {
+      "parameters": {
+        "url": "https://rss.sermonaudio.com/rss_source.asp?sourceid=woodruffroad",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        -40
+      ],
+      "id": "fc6f94e0-c8f9-4bc8-96d1-e1302475e0bc",
+      "name": "Get Sermon Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "86c6a07c-b64d-45c9-b63d-10fab8ad729a",
+              "name": "=sermonLink",
+              "value": "={{$json[\"channel\"][0][\"item\"][0][\"link\"][0]}}",
+              "type": "string"
+            },
+            {
+              "id": "ffb1003d-5f36-4b81-8f31-0f0887710208",
+              "name": "sermonTitle",
+              "value": "={{$json[\"channel\"][0][\"item\"][0][\"title\"][0]}}",
+              "type": "string"
+            },
+            {
+              "id": "a6293d6e-47b0-4cf6-be28-d0c793dd8b19",
+              "name": "mp3URL",
+              "value": "={{ $json.channel[0].item[0].enclosure[0].url[0] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        -40
+      ],
+      "id": "c5f5b899-9cfa-4c66-8a30-2e106e0f14c3",
+      "name": "Extract Sermon data"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Sermon Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse XML to JSON": {
+      "main": [
+        [
+          {
+            "node": "Extract Sermon data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Sermon Data": {
+      "main": [
+        [
+          {
+            "node": "Parse XML to JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Sermon data": {
+      "main": [
+        [
+          {
+            "node": "Download MP3 File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "51a2fe4e-b815-41cd-aafc-e306cf98884c",
+  "meta": {
+    "instanceId": "cc3e1148aa2db61e7cb9d918303b67c0578ab742bb9ca07d8e3e8334915c56f5"
+  },
+  "id": "Aq03xuSH1o75m1v7",
+  "tags": []
+}
