@@ -1,0 +1,202 @@
+{
+  "name": "False Path Transcript Editing",
+  "nodes": [
+    {
+      "parameters": {
+        "folderId": "18LOdNOqMLdulhFN_Ok9CZlsG3NjFiUIJ",
+        "title": "Edit Needed - Transcript for Review"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e5e2253f-c7ab-4cbd-a824-5d02ddea0d2a",
+      "name": "Google Doc Creation for Editing",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "756506bc-df51-4d74-8c72-6cbe73a331d1",
+              "name": "documentID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        300,
+        0
+      ],
+      "id": "ee966b11-bfd0-4279-b7da-b9ea67ce15ce",
+      "name": "Prepare Document Content"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentID }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Extract relevant transcript data').item.json.transcript_text }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        520,
+        0
+      ],
+      "id": "170a8b74-ee3f-42fd-866a-7acdb635253c",
+      "name": "Insert Transcript into Document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hoylelv@gmail.com",
+        "subject": "⚠️Priority: Edit denied transcript",
+        "message": "=The transcript was denied and needs to be reviewed and edited.\n\nClick the link to edit the transcript in Google Docs:\n(https://docs.google.com/document/d/{{ $json.documentId }})\n\nTranscript Preview:\n{{ $('Final Transcript Viewing').item.json.transcript }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        740,
+        0
+      ],
+      "id": "768e7cd7-a7f4-417d-ab16-2f3e470764b8",
+      "name": "Alert Human in the Loop",
+      "webhookId": "82f94966-c2b9-4fc3-9902-019e2259a824",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3dr7mrWhwh04qAV4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "89240bea-50bd-4154-939b-93c85389d970",
+      "name": "Wait for Manual Edits",
+      "webhookId": "506eca92-bbae-41b0-a877-390c51926500"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('Prepare Document Content').item.json.documentID }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        0
+      ],
+      "id": "57b8cdb3-1327-45d8-8425-75a5205b7853",
+      "name": "Retrieve Edited Transcript",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Doc Creation for Editing": {
+      "main": [
+        [
+          {
+            "node": "Prepare Document Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Document Content": {
+      "main": [
+        [
+          {
+            "node": "Insert Transcript into Document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert Transcript into Document": {
+      "main": [
+        [
+          {
+            "node": "Alert Human in the Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Human in the Loop": {
+      "main": [
+        [
+          {
+            "node": "Wait for Manual Edits",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for Manual Edits": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Edited Transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "947494a9-2211-4e74-8bbc-9441e5079097",
+  "meta": {
+    "instanceId": "cc3e1148aa2db61e7cb9d918303b67c0578ab742bb9ca07d8e3e8334915c56f5"
+  },
+  "id": "acG7dTvCrKSQjJMr",
+  "tags": []
+}
