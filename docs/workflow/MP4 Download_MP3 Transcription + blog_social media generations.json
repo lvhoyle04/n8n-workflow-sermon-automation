@@ -3,13 +3,13 @@
   "nodes": [
     {
       "parameters": {
-        "url": "https://api.sermonaudio.com/v2/node/sermons?sourceid=woodruffroad&limit=1",
+        "url": "https://api.sermonaudio.com/v2/node/sermons?sourceid=[Enter Broadcaster's ID here]&limit=1",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "X-Api-Key",
-              "value": "17003479-6AC8-48FD-B11F-BC8EA840980C"
+              "value": "Insert SermonAudio API Key Here"
             }
           ]
         },
