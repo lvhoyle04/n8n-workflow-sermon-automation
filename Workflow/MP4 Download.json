@@ -1,0 +1,140 @@
+{
+  "name": "MP4 Download",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://api.sermonaudio.com/v2/node/sermons?sourceid=woodruffroad&limit=1",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Api-Key",
+              "value": "17003479-6AC8-48FD-B11F-BC8EA840980C"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a6c50515-2b16-456e-b4e7-13b4c9582f3f",
+      "name": "Get Latest Sermon"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "666cd264-3a95-42db-8c12-7eb482a50ee0",
+              "name": "mp4Url",
+              "value": "={{ $json.results[0].media.video[1].downloadURL }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ],
+      "id": "87610a27-5a7c-4f5e-9496-0cd9f737564f",
+      "name": "Extract MP4 Download URL"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.mp4Url }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        460,
+        0
+      ],
+      "id": "586c7f0c-e9e7-4b47-9ab2-ef55dc94d795",
+      "name": "Download Sermon MP4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c3debe51-0a21-4007-a2c7-f55d7b192dae",
+              "name": "mp4Url",
+              "value": "={{ $json.mp4Url }}",
+              "type": "string"
+            },
+            {
+              "id": "e17ab94c-5c89-4a1b-9152-1069fe24db5f",
+              "name": "sermonTitle",
+              "value": "={{ $('Get Latest Sermon').item.json.results[0].fullTitle }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        700,
+        0
+      ],
+      "id": "a195c007-82c1-45c8-b3e0-42c70050f3e8",
+      "name": "Edit Fields1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get Latest Sermon": {
+      "main": [
+        [
+          {
+            "node": "Extract MP4 Download URL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract MP4 Download URL": {
+      "main": [
+        [
+          {
+            "node": "Download Sermon MP4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Sermon MP4": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eda6a4e2-265d-4b1e-b89e-915d93f63f63",
+  "meta": {
+    "instanceId": "cc3e1148aa2db61e7cb9d918303b67c0578ab742bb9ca07d8e3e8334915c56f5"
+  },
+  "id": "acG7dTvCrKSQjJMr",
+  "tags": []
+}
