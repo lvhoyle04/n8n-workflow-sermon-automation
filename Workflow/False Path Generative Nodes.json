@@ -1,0 +1,696 @@
+{
+  "name": "False Path Generative Nodes",
+  "nodes": [
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate a 300-500 word blog post based on this sermon from a Reformed Christian perspective. Transcript provided below:\n{{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a5479483-f225-4097-9e32-a5c8344f372a",
+      "name": "Generating blog posts1",
+      "credentials": {
+        "openAiApi": {
+          "id": "mC6NHOdsPQp4zPij",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hoylelv@gmail.com",
+        "subject": "Generated Blog Post Approval Required",
+        "message": "=This is the generated blog post for this week's sermon, review and approve or deny:\n{{ $json.message.content }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        360,
+        0
+      ],
+      "id": "5558b181-e866-4419-b3b2-ff5a2970191e",
+      "name": "Blog Generation Approval Required1",
+      "webhookId": "9fc88d71-cc78-44fb-b088-24907a5d1565",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3dr7mrWhwh04qAV4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1044d7ac-dd68-4b20-9b03-8bc232c9c32f",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        0
+      ],
+      "id": "bcb354c9-e887-471a-bf3f-10eb70bf532a",
+      "name": "If Approved continue/If denied, edit3"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        0
+      ],
+      "id": "74fb2fa1-7c92-4ba8-9264-50508a8f9bd7",
+      "name": "No Operation, do nothing2"
+    },
+    {
+      "parameters": {
+        "folderId": "18LOdNOqMLdulhFN_Ok9CZlsG3NjFiUIJ",
+        "title": "Generated Blog Posts for Review and Editing"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        800,
+        0
+      ],
+      "id": "93e09ea1-7a85-4252-88e6-b2e574ca5978",
+      "name": "google doc creation for blog post editing1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "756506bc-df51-4d74-8c72-6cbe73a331d1",
+              "name": "documentID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "aac57b37-0858-42c9-95d1-875c0ec167b8",
+      "name": "Prepare Document Content (blog posts)1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentID }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Generating blog posts1').item.json.message.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        0
+      ],
+      "id": "99db7768-f620-4b1f-b5bc-cdfdfd6e9be9",
+      "name": "insert generated blog post1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hoylelv@gmail.com",
+        "subject": "⚠️Blog Post denied, Review and edit",
+        "message": "=The failed blog post is in the document below:\n(https://docs.google.com/document/d/{{ $json.documentId }}\n\nPreview:\n{{ $('Generating blog posts1').item.json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1460,
+        0
+      ],
+      "id": "044c0444-3a5b-44f1-adb2-07f1709766cc",
+      "name": "Alert Human in the loop (blog post)1",
+      "webhookId": "9c13969d-0e4f-410a-85d5-095a118b250a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3dr7mrWhwh04qAV4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        0
+      ],
+      "id": "867793f7-c227-4930-a5cd-c21727148522",
+      "name": "Wait for manual edits (blog post)1",
+      "webhookId": "95268593-96bd-4e11-8802-75189a2a3d41"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('insert generated blog post1').item.json.documentId }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        0
+      ],
+      "id": "c7c2ba00-1eac-4de7-9868-fbed25c6f4b0",
+      "name": "Retrieve Edited Transcript (blog post)1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "chatgpt-4o-latest",
+          "mode": "list",
+          "cachedResultName": "CHATGPT-4O-LATEST"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Generate social media captions based on the sermon transcript provided below:\n{{ $json.content }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        0,
+        300
+      ],
+      "id": "9e45a86b-74b2-4208-a149-0e566532059e",
+      "name": "Generating Social Media Captions1",
+      "credentials": {
+        "openAiApi": {
+          "id": "mC6NHOdsPQp4zPij",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hoylelv@gmail.com",
+        "subject": "Social Media Captions Generation Approval Needed",
+        "message": "=these are the generated social media captions for this week's sermon, review and approve/disapprove:\n{{ $json.message.content }}",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        360,
+        300
+      ],
+      "id": "e831945c-950f-403e-83ed-2af4c9fb6ecd",
+      "name": "Social Media Captions Generation Approval Required1",
+      "webhookId": "9472b27a-f96a-464c-8e76-e2bc47834ab0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3dr7mrWhwh04qAV4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1044d7ac-dd68-4b20-9b03-8bc232c9c32f",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        580,
+        300
+      ],
+      "id": "243aace3-5dc0-48ca-a344-540d931ab4d0",
+      "name": "If Approved continue/If denied, edit4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        2120,
+        300
+      ],
+      "id": "47433f1f-4859-4c53-8f7f-bd323981c0b9",
+      "name": "No Operation, do nothing3"
+    },
+    {
+      "parameters": {
+        "folderId": "18LOdNOqMLdulhFN_Ok9CZlsG3NjFiUIJ",
+        "title": "Social Media Generations Review and Editing"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        800,
+        300
+      ],
+      "id": "247a9bd5-16f3-4320-bd8b-174a8e3e9bf9",
+      "name": "google doc creation for social media captions editing1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "756506bc-df51-4d74-8c72-6cbe73a331d1",
+              "name": "documentID",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1020,
+        300
+      ],
+      "id": "252b0a79-0788-4f99-828a-3837fd4b84d3",
+      "name": "Prepare Document Content (social media)1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentURL": "={{ $json.documentID }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "={{ $('Generating Social Media Captions1').item.json.message.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1240,
+        300
+      ],
+      "id": "03bde351-2f21-4500-bf32-7294d7669c17",
+      "name": "insert generated social media captions1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hoylelv@gmail.com",
+        "subject": "⚠️Social Media captions denied, Review and edit",
+        "message": "=The failed social media captions are in the document below:\n(https://docs.google.com/document/d/{{ $json.documentId }}\n\nPreview:\n{{ $('Generating Social Media Captions1').item.json.message.content }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1460,
+        300
+      ],
+      "id": "b26ac69d-0f5c-4e57-9a01-52035b87c1ba",
+      "name": "Alert Human in the loop (social media)1",
+      "webhookId": "9c13969d-0e4f-410a-85d5-095a118b250a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "3dr7mrWhwh04qAV4",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1680,
+        300
+      ],
+      "id": "4a0b4409-53d2-45b1-90a8-53d0515e42d3",
+      "name": "Wait for manual edits (social media)1",
+      "webhookId": "791a1e3d-64c3-41e5-96dc-a045a38f1bb3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('insert generated social media captions1').item.json.documentId }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1900,
+        300
+      ],
+      "id": "8b664214-8953-4ec3-840c-df61db51a090",
+      "name": "Retrieve Edited Transcript (social media)1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "mW29ytvZQVvuxFtu",
+          "name": "Google Docs account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Generating blog posts1": {
+      "main": [
+        [
+          {
+            "node": "Blog Generation Approval Required1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Generation Approval Required1": {
+      "main": [
+        [
+          {
+            "node": "If Approved continue/If denied, edit3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Approved continue/If denied, edit3": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "google doc creation for blog post editing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google doc creation for blog post editing1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Document Content (blog posts)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Document Content (blog posts)1": {
+      "main": [
+        [
+          {
+            "node": "insert generated blog post1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insert generated blog post1": {
+      "main": [
+        [
+          {
+            "node": "Alert Human in the loop (blog post)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Human in the loop (blog post)1": {
+      "main": [
+        [
+          {
+            "node": "Wait for manual edits (blog post)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for manual edits (blog post)1": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Edited Transcript (blog post)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Edited Transcript (blog post)1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generating Social Media Captions1": {
+      "main": [
+        [
+          {
+            "node": "Social Media Captions Generation Approval Required1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Social Media Captions Generation Approval Required1": {
+      "main": [
+        [
+          {
+            "node": "If Approved continue/If denied, edit4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Approved continue/If denied, edit4": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "google doc creation for social media captions editing1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "google doc creation for social media captions editing1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Document Content (social media)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Document Content (social media)1": {
+      "main": [
+        [
+          {
+            "node": "insert generated social media captions1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "insert generated social media captions1": {
+      "main": [
+        [
+          {
+            "node": "Alert Human in the loop (social media)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Alert Human in the loop (social media)1": {
+      "main": [
+        [
+          {
+            "node": "Wait for manual edits (social media)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for manual edits (social media)1": {
+      "main": [
+        [
+          {
+            "node": "Retrieve Edited Transcript (social media)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retrieve Edited Transcript (social media)1": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cb2a51bc-b6bf-4744-8623-813355df6bc1",
+  "meta": {
+    "instanceId": "cc3e1148aa2db61e7cb9d918303b67c0578ab742bb9ca07d8e3e8334915c56f5"
+  },
+  "id": "acG7dTvCrKSQjJMr",
+  "tags": []
+}
